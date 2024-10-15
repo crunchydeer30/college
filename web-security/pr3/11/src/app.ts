@@ -57,7 +57,7 @@ app.post('/login', validate(LoginSchema), async (req, res, next) => {
       throw createHttpError(401, 'Invalid email or password');
     }
 
-    const token = Jwt.sign({ id: user.id }, env.JWT_SECRET, {
+    const token = Jwt.sign({ id: user.id, role: user.role }, env.JWT_SECRET, {
       expiresIn: '1h',
     });
 
@@ -70,6 +70,10 @@ app.post('/login', validate(LoginSchema), async (req, res, next) => {
 });
 
 app.get('/', auth.required, (_req, res) => {
+  res.send('OK');
+});
+
+app.get('/admin', auth.admin, (_req, res) => {
   res.send('OK');
 });
 
