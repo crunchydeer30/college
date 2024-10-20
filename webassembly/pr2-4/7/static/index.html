@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+  <body>
+    <h1>Add two numbers</h1>
+    <form id="form">
+      <input type="number" placeholder="a" name="a" id="a" />
+      <input type="number" name="b" placeholder="b" id="b" />
+      <button type="submit">Add</button>
+    </form>
+    <script>
+      async function fetchWasmFile() {
+        try {
+          const res = await fetch("add.wasm");
+          if (!res.ok) {
+            throw new Error(res.statusText);
+          }
+          const buffer = await res.arrayBuffer();
+          return buffer;
+        } catch (e) {
+          alert(e);
+        }
+      }
+      (async function main() {
+        const wasmBuffer = await fetchWasmFile();
+        const wasmModule = new WebAssembly.Module(wasmBuffer);
+        const instance = new WebAssembly.Instance(wasmModule);
+        const { add } = instance.exports;
+
+        const form = document.getElementById("form");
+        form.onsubmit = (e) => {
+          e.preventDefault();
+          const a = document.getElementById("a").value;
+          const b = document.getElementById("b").value;
+          alert(add(a, b));
+        };
+      })();
+    </script>
+  </body>
+</html>
