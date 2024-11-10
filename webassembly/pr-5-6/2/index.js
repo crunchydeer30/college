@@ -1,5 +1,4 @@
 import fs from "fs/promises";
-import { get } from "http";
 
 // Var 1
 try {
