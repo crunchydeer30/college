@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>WebAssembly Calculator</title>
+  </head>
+  <style>
+    body {
+      font-family: "sans-serif";
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+  </style>
+  <body>
+    <h1>Calculator</h1>
+    <div>
+      <input type="number" id="num1" placeholder="Number 1" />
+      <select id="operation">
+        <option value="add">+</option>
+        <option value="sub">-</option>
+        <option value="mult">×</option>
+        <option value="div">÷</option>
+      </select>
+      <input type="number" id="num2" placeholder="Number 2" />
+      <button onclick="performOperation()">Calculate</button>
+    </div>
+    <h2>Result: <span id="result">0</span></h2>
+    <h3>History</h3>
+    <ul id="history"></ul>
+
+    <script src="calc.js"></script>
+    <script src="script.js"></script>
+  </body>
+</html>

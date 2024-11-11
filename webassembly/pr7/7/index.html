@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Matrix Calculator</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+      }
+      .matrix-input {
+        width: 50px;
+        height: 20px;
+        margin: 5px;
+      }
+      .matrix-container {
+        border: 1px solid #ccc;
+        padding: 10px;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Matrix Calculator</h1>
+    <div>
+      <h2>Matrix 1</h2>
+      <label for="rows">Rows:</label>
+      <input type="number" id="rows-1" value="2" />
+      <label for="cols">Columns:</label>
+      <input type="number" id="cols-1" value="2" />
+      <button id="generate-matrix-1">Generate Matrix</button>
+      <div id="matrix-container-1" class="matrix-container"></div>
+    </div>
+    <div>
+      <h2>Matrix 2</h2>
+      <label for="rows">Rows:</label>
+      <input type="number" id="rows-2" value="2" />
+      <label for="cols">Columns:</label>
+      <input type="number" id="cols-2" value="2" />
+      <button id="generate-matrix-2">Generate Matrix</button>
+      <div id="matrix-container-2" class="matrix-container"></div>
+    </div>
+
+    <button id="calculate-button">Calculate</button>
+    <div id="result-container"></div>
+
+    <script>
+      const genMatrix1 = document.getElementById("generate-matrix-1");
+      const genMatrix2 = document.getElementById("generate-matrix-2");
+
+      const matrixContainer = document.getElementById("matrix-container");
+      const calculateButton = document.getElementById("calculate-button");
+      const resultContainer = document.getElementById("result-container");
+
+      // Add event listener to generate matrix button
+      genMatrix1.addEventListener("click", () => generateMatrix(1));
+      genMatrix2.addEventListener("click", () => generateMatrix(2));
+
+      // Function to generate matrix
+      function generateMatrix(num) {
+        const rowsInput = document.getElementById(`rows-${num}`);
+        const colsInput = document.getElementById(`cols-${num}`);
+        const rows = parseInt(rowsInput.value);
+        const cols = parseInt(colsInput.value);
+        const matrixHtml = [];
+        for (let i = 0; i < rows; i++) {
+          const rowHtml = [];
+          for (let j = 0; j < cols; j++) {
+            rowHtml.push(
+              `<input type="number" class="matrix-input" value="1" id=m${num}-${i}-${j}">`
+            );
+          }
+          matrixHtml.push(`<div>${rowHtml.join(" ")}</div>`);
+        }
+        console.log(matrixHtml);
+        document.getElementById(`matrix-container-${num}`).innerHTML =
+          matrixHtml.join("");
+      }
+
+      // Add event listener to calculate button
+      calculateButton.addEventListener("click", calculateMatrix);
+
+      // Function to calculate matrix
+      function calculateMatrix() {
+        const m1rows = parseInt(document.getElementById("rows-1").value);
+        const m1cols = parseInt(document.getElementById("cols-1").value);
+        const m2rows = parseInt(document.getElementById("rows-2").value);
+        const m2cols = parseInt(document.getElementById("cols-2").value);
+
+        const m1 = [];
+        const m2 = [];
+
+        for (let i = 0; i < m1rows; i++) {
+          const row = [];
+          for (let j = 0; j < m1cols; j++) {
+            row.push(parseFloat(document.getElementById(`m1-${i}-${j}`).value));
+          }
+          m1.push(row);
+        }
+
+        for (let i = 0; i < m2rows; i++) {
+          const row = [];
+          for (let j = 0; j < m2cols; j++) {
+            row.push(parseFloat(document.getElementById(`m2-${i}-${j}`).value));
+          }
+          m2.push(row);
+        }
+
+        // Call the WebAssembly function to perform the calculation
+        const result = wasm.calculateMatrix(matrix);
+        resultContainer.innerHTML = `Result: ${result}`;
+      }
+    </script>
+  </body>
+</html>

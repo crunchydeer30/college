@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+  <body>
+    <h1>Add two numbers</h1>
+    <form id="form">
+      <input type="number" placeholder="a" name="a" id="a" />
+      <select name="op" id="op">
+        <option value="add">+</option>
+        <option value="sub">-</option>
+        <option value="mult">×</option>
+        <option value="div">÷</option>
+      </select>
+      <input type="number" name="b" placeholder="b" id="b" />
+      <button type="submit">Run</button>
+    </form>
+    <script>
+      let wasm;
+      async function load() {
+        try {
+          wasm = await WebAssembly.instantiateStreaming(fetch("calc.wasm"));
+        } catch (e) {
+          alert(e);
+        }
+      }
+
+      const form = document.getElementById("form");
+      form.onsubmit = (e) => {
+        try {
+          e.preventDefault();
+          const op = document.getElementById("op").value;
+          const a = document.getElementById("a").value;
+          const b = document.getElementById("b").value;
+
+          switch (op) {
+            case "add":
+              alert(wasm.instance.exports.add(a, b));
+              break;
+            case "sub":
+              alert(wasm.instance.exports.sub(a, b));
+              break;
+            case "mult":
+              alert(wasm.instance.exports.mult(a, b));
+              break;
+            case "div":
+              console.log(b);
+              if (b == 0) {
+                alert("Cannot divide by zero");
+              } else {
+                alert(wasm.instance.exports.div(a, b));
+              }
+              break;
+          }
+        } catch (e) {
+          alert(e);
+        }
+      };
+      window.onload = load;
+    </script>
+  </body>
+</html>

@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <style>
+      body {
+        font-family: "sans-serif";
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Crypto</h1>
+    <h2>Caesar</h2>
+    <textarea name="caesar_before" id="caesar_before">Before</textarea>
+    <textarea name="caesar_after" id="caesar_after">After</textarea>
+    <input
+      type="number"
+      min="0"
+      max="26"
+      id="shift"
+      placeholder="Shift"
+      value="3"
+    />
+    <button onclick="caesarEncrypt()">Encrypt</button>
+    <button onclick="caesarDecrypt()">Decrypt</button>
+
+    <div>
+      <h2>XOR</h2>
+      <textarea name="xor_before" id="xor_before">Before</textarea>
+      <textarea name="xor_after" id="xor_after">After</textarea>
+      <input type="number" id="key" placeholder="Key" />
+      <button onclick="xorEncrypt()">Encrypt</button>
+      <button onclick="xorDecrypt()">Decrypt</button>
+    </div>
+
+    <script src="script.js"></script>
+    <script src="crypto.js"></script>
+  </body>
+</html>

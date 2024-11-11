@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <style>
+      body {
+        font-family: "sans-serif";
+      }
+    </style>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.4/Chart.js"></script>
+  </head>
+  <body>
+    <h1>Random numbers generator</h1>
+    <div>
+      <input type="number" min="1" max="100" id="size" placeholder="Size" />
+      <input type="number" min="1" max="100" id="min" placeholder="Min" />
+      <input type="number" min="1" max="100" id="max" placeholder="Max" />
+      <button onclick="generate()">Generate</button>
+    </div>
+
+    <canvas id="myChart" style="width: 100%; max-width: 700px"></canvas>
+    <span id="_avg"></span>
+    <span id="_min"></span>
+    <span id="_max"></span>
+
+    <script src="script.js"></script>
+    <script src="rand.js"></script>
+  </body>
+</html>
