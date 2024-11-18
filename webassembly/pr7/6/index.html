@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Image Processing</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        margin: 20px;
+        text-align: center;
+      }
+      .container {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 1rem;
+        max-width: 800px;
+        margin: auto;
+      }
+      button {
+        width: fit-content;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h1>Grayscale</h1>
+      <div class="container">
+        <input type="file" id="imageLoader" accept="image/*" disabled />
+        <canvas id="imageCanvas"></canvas>
+      </div>
+      <br />
+      <button onclick="applyFilter('grayscale')">Grayscale</button>
+    </div>
+
+    <script>
+      var Module = {
+        onRuntimeInitialized: function () {
+          document.getElementById("imageLoader").disabled = false;
+          document
+            .querySelectorAll("button")
+            .forEach((btn) => (btn.disabled = false));
+          document.getElementById("contrastRange").disabled = false;
+        },
+      };
+    </script>
+    <script src="image_processing.js"></script>
+    <script>
+      const imageLoader = document.getElementById("imageLoader");
+      const canvas = document.getElementById("imageCanvas");
+      const ctx = canvas.getContext("2d");
+      let imageData;
+
+      imageLoader.addEventListener("change", handleImage);
+
+      function handleImage(e) {
+        const reader = new FileReader();
+        reader.onload = function (event) {
+          const img = new Image();
+          img.onload = function () {
+            canvas.width = img.width;
+            canvas.height = img.height;
+            ctx.drawImage(img, 0, 0);
+            imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+          };
+          img.src = event.target.result;
+        };
+        reader.readAsDataURL(e.target.files[0]);
+      }
+
+      function applyFilter(filterType) {
+        const imagePtr = Module._malloc(imageData.data.length);
+        Module.HEAPU8.set(imageData.data, imagePtr);
+
+        if (filterType === "grayscale") {
+          Module._toGrayscale(imagePtr, imageData.width, imageData.height);
+        } else if (filterType === "smooth") {
+          Module._smooth(imagePtr, imageData.width, imageData.height);
+        }
+
+        const resultData = Module.HEAPU8.subarray(
+          imagePtr,
+          imagePtr + imageData.data.length
+        );
+        imageData.data.set(resultData);
+        ctx.putImageData(imageData, 0, 0);
+        Module._free(imagePtr);
+      }
+
+      function applyContrast() {
+        const contrast = parseFloat(
+          document.getElementById("contrastRange").value
+        );
+        const imagePtr = Module._malloc(imageData.data.length);
+        Module.HEAPU8.set(imageData.data, imagePtr);
+
+        Module._adjustContrast(
+          imagePtr,
+          imageData.width,
+          imageData.height,
+          contrast
+        );
+
+        const resultData = Module.HEAPU8.subarray(
+          imagePtr,
+          imagePtr + imageData.data.length
+        );
+        imageData.data.set(resultData);
+        ctx.putImageData(imageData, 0, 0);
+        Module._free(imagePtr);
+      }
+    </script>
+  </body>
+</html>

@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>File Operations</title>
+    <style>
+      input,
+      textarea,
+      button {
+        margin: 10px;
+      }
+      textarea {
+        width: 300px;
+        height: 200px;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>File Operations with WebAssembly</h1>
+
+    <label for="inputFile">Select a file to read:</label><br />
+    <input type="file" id="inputFile" onchange="readFileFromInput()" /><br />
+
+    <h2>File Content:</h2>
+    <textarea id="fileContent" readonly></textarea><br />
+
+    <script>
+      var Module = {
+        onRuntimeInitialized: function () {},
+      };
+
+      function readFileFromInput() {
+        const file = document.getElementById("inputFile").files[0];
+        if (file) {
+          const reader = new FileReader();
+          reader.onload = function (event) {
+            const content = event.target.result;
+            document.getElementById("fileContent").value = content;
+          };
+          reader.readAsText(file);
+        }
+      }
+    </script>
+
+    <script src="file_operations.js"></script>
+  </body>
+</html>

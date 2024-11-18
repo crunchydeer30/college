@@ -1,112 +1,243 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
   <head>
-    <title>Matrix Calculator</title>
+    <meta charset="UTF-8" />
+    <title>Matrix Operations</title>
     <style>
       body {
         font-family: Arial, sans-serif;
+        margin: 20px;
+        text-align: center;
       }
-      .matrix-input {
-        width: 50px;
-        height: 20px;
-        margin: 5px;
+      .container {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        max-width: 800px;
+        margin: auto;
       }
-      .matrix-container {
-        border: 1px solid #ccc;
-        padding: 10px;
+      .matrices {
+        display: flex;
+      }
+      .input-matrix {
+        margin: 10px;
+      }
+      .controls {
+        display: flex;
+        gap: 1rem;
+      }
+      td,
+      th {
+        padding: 5px;
+        text-align: center;
       }
     </style>
   </head>
   <body>
-    <h1>Matrix Calculator</h1>
-    <div>
-      <h2>Matrix 1</h2>
-      <label for="rows">Rows:</label>
-      <input type="number" id="rows-1" value="2" />
-      <label for="cols">Columns:</label>
-      <input type="number" id="cols-1" value="2" />
-      <button id="generate-matrix-1">Generate Matrix</button>
-      <div id="matrix-container-1" class="matrix-container"></div>
+    <div class="container">
+      <h1>Matrix Operations</h1>
+      <div class="matrices">
+        <div class="input-matrix">
+          <h2>Matrix A</h2>
+          <table id="matrixA">
+            <tbody>
+              <tr>
+                <td><input type="number" style="width: 60px" /></td>
+                <td><input type="number" style="width: 60px" /></td>
+                <td><input type="number" style="width: 60px" /></td>
+              </tr>
+              <tr>
+                <td><input type="number" style="width: 60px" /></td>
+                <td><input type="number" style="width: 60px" /></td>
+                <td><input type="number" style="width: 60px" /></td>
+              </tr>
+              <tr>
+                <td><input type="number" style="width: 60px" /></td>
+                <td><input type="number" style="width: 60px" /></td>
+                <td><input type="number" style="width: 60px" /></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="input-matrix">
+          <h2>Matrix B</h2>
+          <table id="matrixB">
+            <tbody>
+              <tr>
+                <td><input type="number" style="width: 60px" /></td>
+                <td><input type="number" style="width: 60px" /></td>
+                <td><input type="number" style="width: 60px" /></td>
+              </tr>
+              <tr>
+                <td><input type="number" style="width: 60px" /></td>
+                <td><input type="number" style="width: 60px" /></td>
+                <td><input type="number" style="width: 60px" /></td>
+              </tr>
+              <tr>
+                <td><input type="number" style="width: 60px" /></td>
+                <td><input type="number" style="width: 60px" /></td>
+                <td><input type="number" style="width: 60px" /></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <div class="controls">
+        <button onclick="addMatrices()">Add</button>
+        <button onclick="multiplyMatrices()">Multiply</button>
+        <button onclick="transposeMatrixA()">Transpose</button>
+      </div>
+      <br /><br />
+      <div>
+        <h2>Result</h2>
+        <table id="resultMatrix"></table>
+      </div>
     </div>
-    <div>
-      <h2>Matrix 2</h2>
-      <label for="rows">Rows:</label>
-      <input type="number" id="rows-2" value="2" />
-      <label for="cols">Columns:</label>
-      <input type="number" id="cols-2" value="2" />
-      <button id="generate-matrix-2">Generate Matrix</button>
-      <div id="matrix-container-2" class="matrix-container"></div>
-    </div>
-
-    <button id="calculate-button">Calculate</button>
-    <div id="result-container"></div>
 
     <script>
-      const genMatrix1 = document.getElementById("generate-matrix-1");
-      const genMatrix2 = document.getElementById("generate-matrix-2");
+      var Module = {
+        onRuntimeInitialized: function () {
+          console.log("WebAssembly module loaded");
+          initializeButtons();
+        },
+      };
 
-      const matrixContainer = document.getElementById("matrix-container");
-      const calculateButton = document.getElementById("calculate-button");
-      const resultContainer = document.getElementById("result-container");
-
-      // Add event listener to generate matrix button
-      genMatrix1.addEventListener("click", () => generateMatrix(1));
-      genMatrix2.addEventListener("click", () => generateMatrix(2));
-
-      // Function to generate matrix
-      function generateMatrix(num) {
-        const rowsInput = document.getElementById(`rows-${num}`);
-        const colsInput = document.getElementById(`cols-${num}`);
-        const rows = parseInt(rowsInput.value);
-        const cols = parseInt(colsInput.value);
-        const matrixHtml = [];
-        for (let i = 0; i < rows; i++) {
-          const rowHtml = [];
-          for (let j = 0; j < cols; j++) {
-            rowHtml.push(
-              `<input type="number" class="matrix-input" value="1" id=m${num}-${i}-${j}">`
-            );
-          }
-          matrixHtml.push(`<div>${rowHtml.join(" ")}</div>`);
-        }
-        console.log(matrixHtml);
-        document.getElementById(`matrix-container-${num}`).innerHTML =
-          matrixHtml.join("");
+      function initializeButtons() {
+        document
+          .querySelectorAll("button")
+          .forEach((btn) => (btn.disabled = false));
       }
 
-      // Add event listener to calculate button
-      calculateButton.addEventListener("click", calculateMatrix);
+      function createMatrices() {
+        const rows = 3;
+        const cols = 3;
+        createMatrix("matrixA", rows, cols);
+        createMatrix("matrixB", rows, cols);
+      }
 
-      // Function to calculate matrix
-      function calculateMatrix() {
-        const m1rows = parseInt(document.getElementById("rows-1").value);
-        const m1cols = parseInt(document.getElementById("cols-1").value);
-        const m2rows = parseInt(document.getElementById("rows-2").value);
-        const m2cols = parseInt(document.getElementById("cols-2").value);
-
-        const m1 = [];
-        const m2 = [];
-
-        for (let i = 0; i < m1rows; i++) {
-          const row = [];
-          for (let j = 0; j < m1cols; j++) {
-            row.push(parseFloat(document.getElementById(`m1-${i}-${j}`).value));
+      function createMatrix(tableId, rows, cols) {
+        const table = document.getElementById(tableId);
+        table.innerHTML = "";
+        for (let i = 0; i < rows; i++) {
+          const row = table.insertRow();
+          for (let j = 0; j < cols; j++) {
+            const cell = row.insertCell();
+            const input = document.createElement("input");
+            input.type = "number";
+            input.style.width = "60px";
+            cell.appendChild(input);
           }
-          m1.push(row);
         }
+      }
 
-        for (let i = 0; i < m2rows; i++) {
-          const row = [];
-          for (let j = 0; j < m2cols; j++) {
-            row.push(parseFloat(document.getElementById(`m2-${i}-${j}`).value));
+      function getMatrixData(tableId) {
+        const table = document.getElementById(tableId);
+        const rows = table.rows.length;
+        const cols = table.rows[0].cells.length;
+        const matrix = new Float64Array(rows * cols);
+        for (let i = 0; i < rows; i++) {
+          for (let j = 0; j < cols; j++) {
+            const input = table.rows[i].cells[j].firstElementChild;
+            matrix[i * cols + j] = parseFloat(input.value) || 0;
           }
-          m2.push(row);
         }
+        return { data: matrix, rows: rows, cols: cols };
+      }
 
-        // Call the WebAssembly function to perform the calculation
-        const result = wasm.calculateMatrix(matrix);
-        resultContainer.innerHTML = `Result: ${result}`;
+      function displayMatrix(matrix, rows, cols, tableId) {
+        const table = document.getElementById(tableId);
+        table.innerHTML = "";
+        for (let i = 0; i < rows; i++) {
+          const row = table.insertRow();
+          for (let j = 0; j < cols; j++) {
+            const cell = row.insertCell();
+            cell.textContent = matrix[i * cols + j].toFixed(2);
+          }
+        }
+      }
+
+      function addMatrices() {
+        const matA = getMatrixData("matrixA");
+        const matB = getMatrixData("matrixB");
+        if (matA.rows !== matB.rows || matA.cols !== matB.cols) {
+          alert("Matrices must have the same dimensions for addition");
+          return;
+        }
+        const matAPtr = Module._malloc(matA.data.byteLength);
+        Module.HEAPF64.set(matA.data, matAPtr / 8);
+
+        const matBPtr = Module._malloc(matB.data.byteLength);
+        Module.HEAPF64.set(matB.data, matBPtr / 8);
+
+        const resultPtr = Module._malloc(matA.data.byteLength);
+        Module._addMatrices(matAPtr, matBPtr, resultPtr, matA.rows, matA.cols);
+
+        const result = new Float64Array(
+          Module.HEAPF64.buffer,
+          resultPtr,
+          matA.rows * matA.cols
+        );
+        displayMatrix(result, matA.rows, matA.cols, "resultMatrix");
+
+        Module._free(matAPtr);
+        Module._free(matBPtr);
+        Module._free(resultPtr);
+      }
+
+      function multiplyMatrices() {
+        const matA = getMatrixData("matrixA");
+        const matB = getMatrixData("matrixB");
+        if (matA.cols !== matB.rows) {
+          alert("Matrix A columns must equal Matrix B rows for multiplication");
+          return;
+        }
+        const matAPtr = Module._malloc(matA.data.byteLength);
+        Module.HEAPF64.set(matA.data, matAPtr / 8);
+
+        const matBPtr = Module._malloc(matB.data.byteLength);
+        Module.HEAPF64.set(matB.data, matBPtr / 8);
+
+        const resultPtr = Module._malloc(matA.rows * matB.cols * 8);
+        Module._multiplyMatrices(
+          matAPtr,
+          matBPtr,
+          resultPtr,
+          matA.rows,
+          matA.cols,
+          matB.cols
+        );
+
+        const result = new Float64Array(
+          Module.HEAPF64.buffer,
+          resultPtr,
+          matA.rows * matB.cols
+        );
+        displayMatrix(result, matA.rows, matB.cols, "resultMatrix");
+
+        Module._free(matAPtr);
+        Module._free(matBPtr);
+        Module._free(resultPtr);
+      }
+
+      function transposeMatrixA() {
+        const matA = getMatrixData("matrixA");
+        const matAPtr = Module._malloc(matA.data.byteLength);
+        Module.HEAPF64.set(matA.data, matAPtr / 8);
+
+        const resultPtr = Module._malloc(matA.cols * matA.rows * 8);
+        Module._transposeMatrix(matAPtr, resultPtr, matA.rows, matA.cols);
+
+        const result = new Float64Array(
+          Module.HEAPF64.buffer,
+          resultPtr,
+          matA.cols * matA.rows
+        );
+        displayMatrix(result, matA.cols, matA.rows, "resultMatrix");
+
+        Module._free(matAPtr);
+        Module._free(resultPtr);
       }
     </script>
+    <script src="matrix_operations.js"></script>
   </body>
 </html>

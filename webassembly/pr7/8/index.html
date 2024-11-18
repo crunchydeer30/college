@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Substring Search</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; text-align: center; }
+        .container { max-width: 800px; margin: auto; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Substring Search</h1>
+        <div>
+            <label for="mainString">Main String:</label>
+            <textarea id="mainString" rows="4" cols="50"></textarea>
+        </div>
+        <div>
+            <label for="substring">Substring:</label>
+            <input type="text" id="substring" />
+        </div>
+        <div>
+            <button onclick="findSubstring()">Find Substring</button>
+            <button onclick="findAllOccurrences()">Find All Occurrences</button>
+            <button onclick="findSubstringCaseInsensitive()">Find Substring (Case Insensitive)</button>
+        </div>
+        <div>
+            <h2>Results</h2>
+            <div id="results"></div>
+        </div>
+    </div>
+
+    <script>
+        var Module = {
+            onRuntimeInitialized: function() {
+                console.log("WebAssembly module loaded");
+                initializeButtons();
+            }
+        };
+
+        function initializeButtons() {
+            document.querySelectorAll("button").forEach(btn => btn.disabled = false);
+        }
+
+        function stringToUTF8OnHeap(str) {
+            const length = lengthBytesUTF8(str) + 1;
+            const ptr = Module._malloc(length);
+            stringToUTF8(str, ptr, length);
+            return ptr;
+        }
+
+        function findSubstring() {
+            const mainString = document.getElementById('mainString').value;
+            const substring = document.getElementById('substring').value;
+            const mainStringPtr = stringToUTF8OnHeap(mainString);
+            const substringPtr = stringToUTF8OnHeap(substring);
+            const result = Module._findSubstring(mainStringPtr, substringPtr);
+            Module._free(mainStringPtr);
+            Module._free(substringPtr);
+            displayResult(result);
+        }
+
+        function findAllOccurrences() {
+            const mainString = document.getElementById('mainString').value;
+            const substring = document.getElementById('substring').value;
+            const mainStringPtr = stringToUTF8OnHeap(mainString);
+            const substringPtr = stringToUTF8OnHeap(substring);
+            const sizePtr = Module._malloc(4);
+            const resultPtr = Module._findAllOccurrences(mainStringPtr, substringPtr, sizePtr);
+            const size = Module.getValue(sizePtr, 'i32');
+            const results = [];
+            for (let i = 0; i < size; i++) {
+                results.push(Module.getValue(resultPtr + i * 4, 'i32'));
+            }
+            Module._free(mainStringPtr);
+            Module._free(substringPtr);
+            Module._free(resultPtr);
+            Module._free(sizePtr);
+            displayResults(results);
+        }
+
+        function findSubstringCaseInsensitive() {
+            const mainString = document.getElementById('mainString').value;
+            const substring = document.getElementById('substring').value;
+            const mainStringPtr = stringToUTF8OnHeap(mainString);
+            const substringPtr = stringToUTF8OnHeap(substring);
+            const result = Module._findSubstringCaseInsensitive(mainStringPtr, substringPtr);
+            Module._free(mainStringPtr);
+            Module._free(substringPtr);
+            displayResult(result);
+        }
+
+        function displayResult(result) {
+            const resultsDiv = document.getElementById('results');
+            resultsDiv.innerHTML = `Position: ${result}`;
+        }
+
+        function displayResults(results) {
+            const resultsDiv = document.getElementById('results');
+            resultsDiv.innerHTML = `Positions: ${results.join(', ')}`;
+        }
+    </script>
+    <script src="search.js"></script>
+</body>
+</html>

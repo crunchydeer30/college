@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Sorting Algorithms</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+      }
+      .container {
+        margin: 0 auto;
+        width: 1000px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+      }
+      .controls {
+        display: flex;
+      }
+      textarea {
+        width: 1000px;
+        height: 400px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h1>Sorting Algorithms</h1>
+      <textarea id="inputArray"></textarea><br />
+
+      <div class="controls">
+        <button onclick="bubbleSort()">Bubble Sort</button>
+        <button onclick="mergeSort()">Merge Sort</button>
+        <button onclick="reset()">Reset</button>
+      </div>
+
+      <h2>Execution Time:</h2>
+      <div id="time"></div>
+      <h2>Result:</h2>
+      <div id="result"></div>
+    </div>
+
+    <script src="sort.js"></script>
+    <script>
+      function reset() {
+        let exampleArray = [];
+        for (let i = 0; i < 20000; i++) {
+          exampleArray.push(Math.floor(Math.random() * 1000));
+        }
+        document.getElementById("inputArray").value = exampleArray.join(", ");
+      }
+      reset();
+
+      let wasm;
+
+      async function load() {
+        const wasmModuleInstance = await Module();
+        wasm = wasmModuleInstance;
+      }
+
+      window.onload = load;
+
+      function bubbleSort() {
+        const startTime = new Date();
+
+        const inputArray = document
+          .getElementById("inputArray")
+          .value.split(",")
+          .map(Number);
+        const n = inputArray.length;
+
+        const arrPtr = wasm._malloc(n * Int32Array.BYTES_PER_ELEMENT);
+        console.log(arrPtr);
+        const arr = new Int32Array(wasm.HEAP32.buffer, arrPtr, n);
+        arr.set(inputArray);
+        wasm._bubbleSort(arrPtr, n);
+        console.log(arr);
+        const sortedArray = new Int32Array(wasm.HEAP32.buffer, arrPtr, n);
+        document.getElementById("result").textContent = sortedArray.join(", ");
+        const endTime = new Date();
+        const executionTime = endTime - startTime;
+
+        document.getElementById("time").textContent = executionTime + " ms";
+      }
+
+      function mergeSort() {
+        const startTime = new Date();
+
+        const inputArray = document
+          .getElementById("inputArray")
+          .value.split(",")
+          .map(Number);
+        const n = inputArray.length;
+
+        let time = 0;
+
+        const arrPtr = wasm._malloc(n * Int32Array.BYTES_PER_ELEMENT);
+        const arr = new Int32Array(wasm.HEAP32.buffer, arrPtr, n);
+        arr.set(inputArray);
+        wasm._mergeSort(arrPtr, 0, n - 1);
+        console.log(arr);
+        const sortedArray = new Int32Array(wasm.HEAP32.buffer, arrPtr, n);
+        document.getElementById("result").textContent = sortedArray.join(", ");
+
+        const endTime = new Date();
+        const executionTime = endTime - startTime;
+
+        document.getElementById("time").textContent = executionTime + " ms";
+      }
+    </script>
+  </body>
+</html>
