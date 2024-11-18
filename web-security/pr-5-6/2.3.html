@@ -1,0 +1,11 @@
+<button onclick="fetchData()">Fetch</button>
+<script>
+  function fetchData() {
+    const token = "limited-access-token";
+    const headers = new Headers();
+    headers.append("Authorization", `Bearer ${token}`);
+    fetch("/data", { method: "GET", headers })
+      .then((response) => response.json())
+      .then((data) => console.log(data));
+  }
+</script>

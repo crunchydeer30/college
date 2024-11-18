@@ -1,0 +1,39 @@
+<input type="text" id="email" />
+<button onclick="submit()">Submit</button>
+<script>
+  let locked = false;
+  let lastSubmitTime = 0;
+
+  function submit() {
+    if (locked) return;
+
+    var email = document.getElementById("email").value;
+    var currentTime = new Date().getTime();
+
+    if (currentTime - lastSubmitTime < 1000) {
+      alert("Please wait before submitting again.");
+      return;
+    }
+
+    lastSubmitTime = currentTime;
+    locked = true;
+
+    fetch("/subscribe", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ email: email }),
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        console.log(data);
+      })
+      .catch((error) => {
+        console.error(error);
+      })
+      .finally(() => {
+        locked = false;
+      });
+  }
+</script>
